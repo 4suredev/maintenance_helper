@@ -64,14 +64,41 @@ class Maintenance_Helper {
 				$fields = $this->get_fields();
 				echo $fields;
 			?>
-			<div class="content" style="background: #ffffff; padding: 20px;"><?= do_shortcode( get_option('maintenancehelper') ); ?></div>
+			<table class="form-table">
+				<tr valign="top">
+					<th scope="row">
+					Email<br /><br />
+					<button id="copy-text" class="button button-primary" onclick="copyToClipboard('#content')">Copy to Clipboard</button>
+					<p class="message" style="display: none;"><i>Copied to Clipboard</i></p>
+					</th>
+					<td><div id="content" class="content" style="background: #ffffff; padding: 20px;"><?= do_shortcode( get_option('maintenancehelper') ); ?></div></td>
+				</tr>
+			</table>
 	    </div>
+
+		<script>
+		function copyToClipboard(element) {
+			var $temp = jQuery("<div style='background: #ffffff;'>");
+			jQuery("body").append($temp);
+			$temp.attr("contenteditable", true)
+				.html(jQuery(element).html()).select()
+				.on("focus", function() { document.execCommand('selectAll',false,null); })
+				.focus();
+			document.execCommand("copy");
+			$temp.remove();
+
+			jQuery('.message').slideDown();
+			setTimeout(function() {
+				jQuery('.message').slideUp();
+			}, 5000);
+		}
+		</script>
 	<?php
 	}
 
 	public function get_maintenance_markup() {
 
-		$markup = '<h3>Plugin &amp; WordPress Core Updates</h3>';
+		$markup = '';
 
 		global $wp_version;
 
@@ -87,13 +114,6 @@ class Maintenance_Helper {
 			}
 			$markup .= "</ul>";
 		}
-
-		$markup .= '<ul>';
-			$markup .= '<li>Hello Test</li>';
-			$markup .= '<li>Hello Test</li>';
-			$markup .= '<li>Hello Test</li>';
-			$markup .= '<li>Hello Test</li>';
-		$markup .= '</ul>';
 
 		$plugins = get_plugin_updates();
 
@@ -210,7 +230,7 @@ class Maintenance_Helper {
 	}
 
 	public function shortcode_analytics_link( $atts ) {
-		return $link = '<a href="'. get_option( 'analytics_link' ) .'" target="_blank">'. get_option( 'analytics_link' ) .'</a>';
+		return $link = '<a href="'. get_option( 'analytics_link' ) .'" target="_blank">View Analytics</a>';
 	}
 
 	public function shortcode_maintenancehelper( $atts ) {
