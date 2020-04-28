@@ -41,7 +41,8 @@ class Maintenance_Helper {
 	}
 
 	public function add_options_page() {
-		add_menu_page( 'Maintenance Helper', 'Maintenance Helper', 'manage_options', 'maintenance-helper', array( $this, 'generate_mailchimp_markup' ), 'dashicons-clipboard' );
+		// add_menu_page( 'Maintenance Helper', 'Maintenance Helper', 'manage_options', 'maintenance-helper', array( $this, 'generate_mailchimp_markup' ), 'dashicons-clipboard' );
+		add_submenu_page( 'tools.php', 'Maintenance Helper', 'Maintenance Helper', 'manage_options', 'maintenance-helper', array( $this, 'generate_mailchimp_markup' ) );
 	}
 
 	public function add_submenu_page(){
