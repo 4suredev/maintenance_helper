@@ -8,6 +8,7 @@ Author: 4sure Online
 Author URI: http://4sure.com.au
 License: GPL2
 Network: true
+GitHub Plugin URI: 4suredev/maintenance_helper
 */
 
 class Maintenance_Helper {
@@ -28,11 +29,13 @@ class Maintenance_Helper {
 			add_action( 'admin_init', 	      array( $this, 'maintenance_settings' ) );
 
 			add_shortcode( 'client_name', array( $this, 'shortcode_client_name' ) );
+			add_shortcode( 'client_email', array( $this, 'shortcode_client_email' ) );
 			add_shortcode( 'broken_links', array( $this, 'shortcode_broken_links' ) );
 			add_shortcode( 'maintenance_month', array( $this, 'shortcode_maintenance_month' ) );
 			add_shortcode( 'analytics_link', array( $this, 'shortcode_analytics_link' ) );
 			add_shortcode( 'updates', array( $this, 'shortcode_updates' ) );
 			add_shortcode( 'maintenancehelper', array( $this, 'shortcode_maintenancehelper' ) );
+			add_shortcode( 'email_subject', array( $this, 'shortcode_email_subject' ) );
 		}
 	}
 
@@ -51,9 +54,11 @@ class Maintenance_Helper {
 
 	public function maintenance_settings() {
 		register_setting( 'maintenance-fields', 'client_name' );
+		register_setting( 'maintenance-fields', 'client_email' );
 		register_setting( 'maintenance-fields', 'broken_links' );
 		register_setting( 'maintenance-fields', 'maintenance_month' );
 		register_setting( 'maintenance-fields', 'analytics_link' );
+		register_setting( 'maintenance-fields', 'email_subject' );
 		register_setting( 'maintenance-fields', 'maintenancehelper' );
 	}
 
@@ -73,6 +78,11 @@ class Maintenance_Helper {
 					<p class="message" style="display: none;"><i>Copied to Clipboard</i></p>
 					</th>
 					<td><div id="content" class="content" style="background: #ffffff; padding: 20px;"><?= do_shortcode( get_option('maintenancehelper') ); ?></div></td>
+				</tr>
+				<tr valign="top">
+					<th scope="row">
+					<a href="mailto:<?= get_option('client_email'); ?>?subject=<?php echo get_option('email_subject').' '.get_option('maintenance_month').' '.date('Y'); ?>" class="button button-primary">Send Mail</button>
+					</th>
 				</tr>
 			</table>
 	    </div>
@@ -173,6 +183,10 @@ class Maintenance_Helper {
 					<td><input type="text" name="client_name" value="<?= esc_attr( get_option('client_name') ) ?>" /></td>
 				</tr>
 				<tr valign="top">
+					<th scope="row">Client Email <br/ ><i>[client_email]</i></th>
+					<td><input type="text" name="client_email" value="<?= esc_attr( get_option('client_email') ) ?>" /></td>
+				</tr>
+				<tr valign="top">
 					<th scope="row">Broken Links <br/ ><i>[broken_links]</i></th>
 					<td><input type="text" name="broken_links" value="<?= esc_attr( get_option('broken_links') ) ?>" /></td>
 				</tr>
@@ -195,6 +209,10 @@ class Maintenance_Helper {
 				<tr valign="top">
 					<th scope="row">Updates <br/ ><i>[updates]</i></th>
 					<td><?= $this->get_maintenance_markup(); ?></td>
+				</tr>
+				<tr valign="top">
+					<th scope="row">Email Subject <br/ ><i>[email_subject]</i></th>
+					<td><input type="text" name="email_subject" value="<?= esc_attr( get_option('email_subject') ) ?>" /></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row">Email Content</th>
@@ -223,6 +241,10 @@ class Maintenance_Helper {
 		return $name = get_option( 'client_name' );
 	}
 
+	public function shortcode_client_email( $atts ) {
+		return $name = get_option( 'client_email' );
+	}
+
 	public function shortcode_broken_links( $atts ) {
 		return $links = get_option( 'broken_links' );
 	}
@@ -234,9 +256,14 @@ class Maintenance_Helper {
 		return $link = '<a href="'. get_option( 'analytics_link' ) .'" target="_blank">View Analytics</a>';
 	}
 
+	public function shortcode_email_subject( $atts ) {
+		return $content = get_option( 'email_subject' );
+	}
+	
 	public function shortcode_maintenancehelper( $atts ) {
 		return $content = get_option( 'maintenancehelper' );
 	}
+
 	public function shortcode_updates( $atts ) {
 		return $updates = $this->get_maintenance_markup();
 	}
