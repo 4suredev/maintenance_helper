@@ -36,6 +36,7 @@ class Maintenance_Helper {
 			add_shortcode( 'updates', array( $this, 'shortcode_updates' ) );
 			add_shortcode( 'maintenancehelper', array( $this, 'shortcode_maintenancehelper' ) );
 			add_shortcode( 'email_subject', array( $this, 'shortcode_email_subject' ) );
+			add_shortcode( 'broken_links_count', array( $this, 'get_broken_links_count' ) );
 		}
 	}
 
@@ -81,7 +82,7 @@ class Maintenance_Helper {
 				</tr>
 				<tr valign="top">
 					<th scope="row">
-					<a href="mailto:<?= get_option('client_email'); ?>?subject=<?php echo get_option('email_subject').' '.get_option('maintenance_month').' '.date('Y'); ?>" class="button button-primary">Send Mail</button>
+					<a href="mailto:<?= get_option('client_email'); ?>?subject=<?php echo get_option('email_subject').' '.get_option('maintenance_month').' '.date('Y'); ?>&body=<?php echo do_shortcode( '[maintenancehelper]' ) ?>" class="button button-primary send-email">Send Mail</button>
 					</th>
 				</tr>
 			</table>
@@ -103,6 +104,9 @@ class Maintenance_Helper {
 				jQuery('.message').slideUp();
 			}, 5000);
 		}
+
+		// var $emailLink = jQuery('.send-email').attr('href') + '&body=' + jQuery('#content').html();
+		// jQuery('.send-email').attr('href', $emailLink);
 		</script>
 	<?php
 	}
@@ -188,7 +192,8 @@ class Maintenance_Helper {
 				</tr>
 				<tr valign="top">
 					<th scope="row">Broken Links <br/ ><i>[broken_links]</i></th>
-					<td><input type="text" name="broken_links" value="<?= esc_attr( get_option('broken_links') ) ?>" /></td>
+					<?php $links = $this->get_broken_links_count() >= 0 ? $this->get_broken_links_count() : esc_attr( get_option('broken_links') ); //Options API as fallback ?>
+					<td><input type="text" name="broken_links" value="<?= $links ?>" /></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row">Select Month <br/ ><i>[maintenance_month]</i></th>
@@ -236,6 +241,18 @@ class Maintenance_Helper {
 		</form>
 	<?php
 	}
+	
+	/**
+	 * Get the broken links count from Broken Links plugin table
+	 */
+	private function get_broken_links_count() {
+		global $wpdb;
+
+		//get links with 'broken' status and are NOT dismissed
+		$q = "SELECT * FROM {$wpdb->prefix}blc_links WHERE broken = 1 AND dismissed != 1";
+
+		return $wpdb->query( $q );
+	}
 
 	public function shortcode_client_name( $atts ) {
 		return $name = get_option( 'client_name' );
@@ -246,7 +263,8 @@ class Maintenance_Helper {
 	}
 
 	public function shortcode_broken_links( $atts ) {
-		return $links = get_option( 'broken_links' );
+		$links = $this->get_broken_links_count() >= 0 ? $this->get_broken_links_count() : get_option( 'broken_links' ); 
+		return $links;
 	}
 	public function shortcode_maintenance_month( $atts ) {
 		return $month = get_option( 'maintenance_month' );
