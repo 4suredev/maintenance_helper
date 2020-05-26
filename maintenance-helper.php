@@ -3,7 +3,7 @@
 Plugin Name: Maintenance Helper
 Plugin URI: http://4sure.com.au
 Description: This plugin generates an email template that will be used to send updates to the client.
-Version: 1.2.1
+Version: 1.2.2
 Author: 4sure Online
 Author URI: http://4sure.com.au
 License: GPL2
@@ -246,12 +246,16 @@ class Maintenance_Helper {
 	 * Get the broken links count from Broken Links plugin table
 	 */
 	private function get_broken_links_count() {
-		global $wpdb;
-
-		//get links with 'broken' status and are NOT dismissed
-		$q = "SELECT * FROM {$wpdb->prefix}blc_links WHERE broken = 1 AND dismissed != 1";
-
-		return $wpdb->query( $q );
+		if( class_exists( 'blcConfigurationManager' ) ) {
+			global $wpdb;
+	
+			//get links with 'broken' status and are NOT dismissed
+			$q = "SELECT * FROM {$wpdb->prefix}blc_links WHERE broken = 1 AND dismissed != 1";
+	
+			return $wpdb->query( $q );
+		} else {
+			return -1;
+		}
 	}
 
 	public function shortcode_client_name( $atts ) {
