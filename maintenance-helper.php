@@ -82,7 +82,7 @@ class Maintenance_Helper {
 				</tr>
 				<tr valign="top">
 					<th scope="row">
-					<a href="mailto:<?= get_option('client_email'); ?>?subject=<?php echo get_option('email_subject').' '.get_option('maintenance_month').' '.date('Y'); ?>&body=<?php echo do_shortcode( '[maintenancehelper]' ) ?>" class="button button-primary send-email">Send Mail</button>
+					<a href="mailto:<?= get_option('client_email'); ?>?subject=<?php echo get_option('email_subject').' '.get_option('maintenance_month').' '.date('Y'); ?>" class="button button-primary send-email">Send Mail</button>
 					</th>
 				</tr>
 			</table>
