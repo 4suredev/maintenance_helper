@@ -3,14 +3,20 @@
 Plugin Name: Maintenance Helper
 Plugin URI: http://4sure.com.au
 Description: This plugin generates an email template that will be used to send updates to the client.
-Version: 1.2.2
+Version: 1.3.0
 Author: 4sure Online
 Author URI: http://4sure.com.au
 License: GPL2
 Network: true
-GitHub Plugin URI: 4suredev/maintenance_helper
 */
-
+include_once( plugin_dir_path( __FILE__ ) . 'updater.php');
+$updater = new Maintenance_helper_updater( __FILE__ ); 
+$updater->set_username( '4suredev' ); 
+$updater->set_repository( 'maintenance_helper' ); 
+$updater->initialize(); 
+if( ! class_exists( 'Maintenance_helper_updater' ) ){
+	include_once( plugin_dir_path( __FILE__ ) . 'updater.php' );
+}
 class Maintenance_Helper {
 	private static $instance;
 
@@ -20,7 +26,6 @@ class Maintenance_Helper {
 
 		return self::$instance;
 	}
-
 	private function __construct() {
 		if( current_user_can( 'administrator' ) ) {
 			add_action( 'admin_enqueue_scripts', array( $this, 'maintenance_styles' ) );
