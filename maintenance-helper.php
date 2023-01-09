@@ -3,7 +3,7 @@
 Plugin Name: Maintenance Helper
 Plugin URI: http://4sure.com.au
 Description: This plugin generates an email template that will be used to send updates to the client.
-Version: 1.4.1
+Version: 1.4.2
 Author: 4sure Online
 Author URI: http://4sure.com.au
 License: GPL2
@@ -137,7 +137,7 @@ class Maintenance_Helper {
 		}
 		else {
 			if( $current->id === 'update-core' || $current->id === 'plugins' ) {
-				echo "<div id='maintenance-notification' class='notice notice-warning'><h3>Please do not run updates here!</h3><p>Updates to WordPress core, themes and plugins are managed by 4sure Online as part of your maintenance plan. These updates are usually done once per month, and are thoroughly tested before being deployed to the live website.</p> <p>As plugins are third party software managed by a number of different developers, they do not have consistent or regular release cycles, so you may sometimes see some updates available when their releases come out in the period between the 4sure Online maintenance cycles.</p> <p>In the rare case that an update fixes a critical security issue, these updates are applied immediately. Any time spent addressing issues that arise from updates run by someone apart from 4sure Online <strong>will not be covered by your maintenance plan</strong>.</p></div>";
+				echo "<div id='maintenance-notification' class='notice notice-warning'><h3>Please do not run updates here!</h3><p><strong>Updates to WordPress core, themes and plugins are managed by 4sure Online as part of your maintenance plan.</strong> These updates are usually done once per month, and are thoroughly tested before being deployed to the live website.</p> <p>As plugins are third party software managed by a number of different developers, they do not have consistent or regular release cycles, so you may sometimes see some updates available when their releases come out in the period between the 4sure Online maintenance cycles.</p> <p>In the rare case that an update fixes a critical security issue, these updates are applied immediately.</p> <p>Any time spent addressing issues that arise from updates run by someone apart from 4sure Online <strong>will not be covered by your maintenance plan.</strong></p></div>";
 			}
 		}
 	}
