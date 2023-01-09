@@ -3,7 +3,7 @@
 Plugin Name: Maintenance Helper
 Plugin URI: http://4sure.com.au
 Description: This plugin generates an email template that will be used to send updates to the client.
-Version: 1.3.1
+Version: 1.4.0
 Author: 4sure Online
 Author URI: http://4sure.com.au
 License: GPL2
@@ -42,6 +42,8 @@ class Maintenance_Helper {
 			add_shortcode( 'maintenancehelper', array( $this, 'shortcode_maintenancehelper' ) );
 			add_shortcode( 'email_subject', array( $this, 'shortcode_email_subject' ) );
 			add_shortcode( 'broken_links_count', array( $this, 'get_broken_links_count' ) );
+
+			add_shortcode( 'notification_message', array( $this, 'shortcode_notification_message' ) );
 		}
 	}
 
@@ -66,6 +68,8 @@ class Maintenance_Helper {
 		register_setting( 'maintenance-fields', 'analytics_link' );
 		register_setting( 'maintenance-fields', 'email_subject' );
 		register_setting( 'maintenance-fields', 'maintenancehelper' );
+
+		register_setting( 'notification-fields', 'notification_message' );
 	}
 
 	public function generate_mailchimp_markup() { ?>
@@ -91,6 +95,13 @@ class Maintenance_Helper {
 					</th>
 				</tr>
 			</table>
+			<div class="notification-field">
+				<h1>Custom Notification Message</h1>
+				<?php 
+					$notif_fields = $this->get_notifFields();
+					echo $notif_fields;
+				?>
+			</div>
 	    </div>
 
 		<script>
@@ -114,6 +125,21 @@ class Maintenance_Helper {
 		// jQuery('.send-email').attr('href', $emailLink);
 		</script>
 	<?php
+	}
+
+	static function custom_admin_notif() {
+		$current = get_current_screen();
+
+		if( get_option('notification_message') ) {
+			if( $current->id === 'update-core' || $current->id === 'plugins' ) {
+				echo "<div id='maintenance-notification' class='notice notice-warning'>".get_option('notification_message')."</div>";
+			}
+		}
+		else {
+			if( $current->id === 'update-core' || $current->id === 'plugins' ) {
+				echo "<div id='maintenance-notification' class='notice notice-warning'><h3>Please do not run updates here!</h3><p>Updates to WordPress core, themes and plugins are managed by 4sure Online as part of your maintenance plan. These updates are usually done once per month, and are thoroughly tested before being deployed to the live website.</p> <p>As plugins are third party software managed by a number of different developers, they do not have consistent or regular release cycles, so you may sometimes see some updates available when their releases come out in the period between the 4sure Online maintenance cycles.</p> <p>In the rare case that an update fixes a critical security issue, these updates are applied immediately. Any time spent addressing issues that arise from updates run by someone apart from 4sure Online <strong>will not be covered by your maintenance plan</strong>.</p></div>";
+			}
+		}
 	}
 
 	public function get_maintenance_markup() {
@@ -247,6 +273,29 @@ class Maintenance_Helper {
 	<?php
 	}
 	
+	public function get_notifFields(){ ?>
+		<form method="POST" action="options.php">
+			<?php settings_fields('notification-fields'); ?>
+			<?php do_settings_sections('notification-fields') ?>
+			<div class="row">
+				<?php 
+					$notif = !empty( get_option('notification_message') ) ? get_option( 'notification_message' ) : '';
+					$editor_id = 'notification_message';
+					$settings = array(
+						'wpauto'		=> false,
+						'media_buttons' => false,
+					);
+					wp_editor( $notif, $editor_id, $settings );
+					if( isset( $_POST['notification_message'] ) ) {
+						update_option( 'notification_message', $_POST['notification_message'] ); 
+					}
+				?>
+				<?php submit_button( 'Save' ) ?>
+			</div>
+		</form>
+	<?php
+	}
+
 	/**
 	 * Get the broken links count from Broken Links plugin table
 	 */
@@ -294,5 +343,11 @@ class Maintenance_Helper {
 	public function shortcode_updates( $atts ) {
 		return $updates = $this->get_maintenance_markup();
 	}
+
+	public function shortcode_notification_message ( $atts ) {
+		return $notif = $this->get_option('notification_message');
+	}
 }
 add_action( 'plugins_loaded', array( 'Maintenance_Helper' , 'get_instance' ) );
+
+add_action( 'admin_notices', array( 'Maintenance_Helper' , 'custom_admin_notif' ) );
