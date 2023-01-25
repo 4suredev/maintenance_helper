@@ -3,7 +3,7 @@
 Plugin Name: Maintenance Helper
 Plugin URI: http://4sure.com.au
 Description: This plugin generates an email template that will be used to send updates to the client.
-Version: 1.4.2
+Version: 1.5.1
 Author: 4sure Online
 Author URI: http://4sure.com.au
 License: GPL2
@@ -44,6 +44,8 @@ class Maintenance_Helper {
 			add_shortcode( 'broken_links_count', array( $this, 'get_broken_links_count' ) );
 
 			add_shortcode( 'notification_message', array( $this, 'shortcode_notification_message' ) );
+			add_shortcode( 'bcc_email', array( $this, 'shortcode_bcc_email' ) );
+			add_shortcode( 'site_name', array( $this, 'shortcode_sitename' ) );
 		}
 	}
 
@@ -67,6 +69,8 @@ class Maintenance_Helper {
 		register_setting( 'maintenance-fields', 'maintenance_month' );
 		register_setting( 'maintenance-fields', 'analytics_link' );
 		register_setting( 'maintenance-fields', 'email_subject' );
+		register_setting( 'maintenance-fields', 'bcc_email' );
+		register_setting( 'maintenance-fields', 'site_name' );
 		register_setting( 'maintenance-fields', 'maintenancehelper' );
 
 		register_setting( 'notification-fields', 'notification_message' );
@@ -91,7 +95,7 @@ class Maintenance_Helper {
 				</tr>
 				<tr valign="top">
 					<th scope="row">
-					<a href="mailto:<?= get_option('client_email'); ?>?subject=<?php echo get_option('email_subject').' '.get_option('maintenance_month').' '.date('Y'); ?>" class="button button-primary send-email">Send Mail</button>
+					<a href="mailto:<?= get_option('client_email'); ?>?bcc=<?php echo get_option('bcc_email'); ?>&subject=<?php echo get_option('email_subject').' '.get_option('site_name').' - '.get_option('maintenance_month').' '.date('Y'); ?>" class="button button-primary send-email">Send Mail</button>
 					</th>
 				</tr>
 			</table>
@@ -218,8 +222,16 @@ class Maintenance_Helper {
 					<td><input type="text" name="client_name" value="<?= esc_attr( get_option('client_name') ) ?>" /></td>
 				</tr>
 				<tr valign="top">
+					<th scope="row">Site Name <br/ ><i>[site_name]</i></th>
+					<td><input type="text" name="site_name" value="<?= esc_attr( get_option('site_name') ) ?>" /></td>
+				</tr>
+				<tr valign="top">
 					<th scope="row">Client Email <br/ ><i>[client_email]</i></th>
 					<td><input type="text" name="client_email" value="<?= esc_attr( get_option('client_email') ) ?>" /></td>
+				</tr>
+				<tr valign="top">
+					<th scope="row">BCC Email <br/ ><i>[bcc_email]</i></th>
+					<td><input type="text" name="bcc_email" value="<?= esc_attr( get_option('bcc_email') ) ?>" /></td>
 				</tr>
 				<tr valign="top">
 					<th scope="row">Broken Links <br/ ><i>[broken_links]</i></th>
@@ -229,11 +241,19 @@ class Maintenance_Helper {
 				<tr valign="top">
 					<th scope="row">Select Month <br/ ><i>[maintenance_month]</i></th>
 					<td>
+						<?php $currmonth = date('F'); ?>
 						<?php $options = $this->get_months(); $value = get_option('maintenance_month'); ?>
-						<select name="maintenance_month" value="<?= esc_attr( get_option('maintenance_month') ) ?>">
-							<option value="" <?php if( get_option('maintenance_month') == '' ) { echo 'selected'; } ?>>Select Month</option>
+						<select name="maintenance_month" value="<?= esc_attr( $value ); ?>">
+							<option value="" <?php if( $value  == '' ) { echo 'selected'; } ?>>Select Month</option>
 							<?php foreach( $options as $month ) { ?>
-							<option value=<?= $month ?> <?= $selected = $month == $value ? 'selected' : ''; ?>><?= $month; ?></option>
+							<option value=<?= $month ?> 
+							<?php
+								if($month == $currmonth){ 
+									echo "selected";
+								}
+							?>> 
+							<?= $month; ?>							 
+							</option>
 							<?php } ?>
 						</select>
 					</td>
@@ -338,6 +358,14 @@ class Maintenance_Helper {
 	
 	public function shortcode_maintenancehelper( $atts ) {
 		return $content = get_option( 'maintenancehelper' );
+	}
+
+	public function shortcode_bcc_email ( $atts ) {
+		return $name = get_option('bcc_email');
+	}
+
+	public function shortcode_sitename ( $atts ) {
+		return $sitename = get_option('site_name');
 	}
 
 	public function shortcode_updates( $atts ) {
