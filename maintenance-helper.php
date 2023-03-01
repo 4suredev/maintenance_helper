@@ -3,7 +3,7 @@
 Plugin Name: Maintenance Helper
 Plugin URI: http://4sure.com.au
 Description: This plugin generates an email template that will be used to send updates to the client.
-Version: 1.5.1
+Version: 1.5.2
 Author: 4sure Online
 Author URI: http://4sure.com.au
 License: GPL2
@@ -95,7 +95,13 @@ class Maintenance_Helper {
 				</tr>
 				<tr valign="top">
 					<th scope="row">
-					<a href="mailto:<?= get_option('client_email'); ?>?bcc=<?php echo get_option('bcc_email'); ?>&subject=<?php echo get_option('email_subject').' '.get_option('site_name').' - '.get_option('maintenance_month').' '.date('Y'); ?>" class="button button-primary send-email">Send Mail</button>
+					<?php
+						if(get_option('bcc_email')){
+							$bccemail = get_option('bcc_email');
+							$bcc = "bcc=".$bccemail."&";
+						}
+					?>
+					<a href="mailto:<?= get_option('client_email'); ?>?<?php echo $bcc; ?>subject=<?php echo get_option('email_subject').' '.get_option('site_name').' - '.get_option('maintenance_month').' '.date('Y'); ?>" class="button button-primary send-email">Send Mail</button>
 					</th>
 				</tr>
 			</table>
