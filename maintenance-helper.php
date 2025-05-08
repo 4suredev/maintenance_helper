@@ -1,9 +1,9 @@
 <?php
 /*
-Plugin Name: Maintenance Helper
+Plugin Name: 4sure - Maintenance Helper
 Plugin URI: http://4sure.com.au
 Description: This plugin generates an email template that will be used to send updates to the client.
-Version: 1.5.2
+Version: 1.5.3
 Author: 4sure Online
 Author URI: http://4sure.com.au
 License: GPL2
