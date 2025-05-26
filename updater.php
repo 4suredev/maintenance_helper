@@ -63,7 +63,7 @@ class Maintenance_helper_updater {
           if( $transient->checked ) { // Did WordPress check for updates?
           	$checked =  $transient->checked;
             $this->get_repository_info(); // Get the repo info
-            if (isset($checked[$this->basename]) != null) {
+             if (!empty($checked[$this->basename])) {
             	$out_of_date = version_compare( $this->github_response['tag_name'], $checked[$this->basename], 'gt' ); // Check if we're out of date
             } else {
               $out_of_date = false;
