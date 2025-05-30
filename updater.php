@@ -60,15 +60,16 @@ class Maintenance_helper_updater {
 	}
     public function modify_transient( $transient ) {
         if( property_exists( $transient, 'checked') ) { // Check if transient has a checked property
-          if( $transient->checked ) { // Did WordPress check for updates?
-          	$checked =  $transient->checked;
+          if( $checked =  $transient->checked ) { // Did WordPress check for updates?
             $this->get_repository_info(); // Get the repo info
-             if (!empty($checked[$this->basename])) {
-            	$out_of_date = version_compare( $this->github_response['tag_name'], $checked[$this->basename], 'gt' ); // Check if we're out of date
+            $git_tag = $this->github_response['tag_name'];
+            $plugin_base = $checked[$this->basename];
+            if ( !empty($git_tag) && !empty($plugin_base) ) { // Check if not null to prevent error
+              $out_of_date = version_compare( $git_tag, $plugin_base, 'gt' ); // Check if we're out of date
             } else {
               $out_of_date = false;
             }
-            if( $out_of_date != false ) {
+            if( $out_of_date ) {
               $new_files = $this->github_response['zipball_url']; // Get the ZIP
               $slug = current( explode('/', $this->basename ) ); // Create valid slug
               $plugin = array( // setup our plugin info
