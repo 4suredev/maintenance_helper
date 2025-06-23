@@ -59,13 +59,11 @@ class Maintenance_helper_updater {
 		);
 	}
     public function modify_transient( $transient ) {
-        if( property_exists( $transient, 'checked') ) { // Check if transient has a checked property
+       if( property_exists( $transient, 'checked') ) { // Check if transient has a checked property
           if( $checked =  $transient->checked ) { // Did WordPress check for updates?
             $this->get_repository_info(); // Get the repo info
-            $git_tag = $this->github_response['tag_name'];
-            $plugin_base = $checked[$this->basename];
-            if ( !empty($git_tag) && !empty($plugin_base) ) { // Check if not null to prevent error
-              $out_of_date = version_compare( $git_tag, $plugin_base, 'gt' ); // Check if we're out of date
+            if( is_array($this->github_response) && !empty($this->github_response['tag_name']) && !empty($checked[$this->basename]) ) { // Check response
+               $out_of_date = version_compare( $this->github_response['tag_name'], $checked[$this->basename], 'gt' ); // Check if we're out of date
             } else {
               $out_of_date = false;
             }
