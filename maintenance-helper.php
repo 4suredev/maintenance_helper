@@ -3,7 +3,7 @@
 Plugin Name: 4sure - Maintenance Helper
 Plugin URI: http://4sure.com.au
 Description: This plugin generates an email template that will be used to send updates to the client.
-Version: 1.5.5
+Version: 1.5.6
 Author: 4sure Online
 Author URI: http://4sure.com.au
 License: GPL2
@@ -77,9 +77,20 @@ class Maintenance_Helper {
 	}
 
 	public function generate_mailchimp_markup() { ?>
-
 		<div id="maintenance-helper" class="wrap">
 			<h1>Maintenance Helper</h1>
+			<!-- Additional -->
+			<div class="maintenance-header">
+				<div class="maintenance-header-inner">
+					<p class="message" style="display: none;"><i>Copied to Clipboard</i></p>
+					<div class="header-right">
+						<button class="button button-primary header-btn" data-target="submit">Save and Generate</button>
+						<button id="copy-text" class="button button-primary header-btn" onclick="copyToClipboard('#content')">Copy to Clipboard</button>
+						<a href="mailto:<?= get_option('client_email'); ?>?<?php echo $bcc; ?>subject=<?php echo get_option('email_subject').' '.get_option('site_name').' - '.get_option('maintenance_month').' '.date('Y'); ?>" class="button button-primary send-email header-btn">Send Mail</a>
+					</div>
+				</div>
+			</div>
+			<!-- End -->
 			<?php
 				$fields = $this->get_fields();
 				echo $fields;
@@ -88,8 +99,7 @@ class Maintenance_Helper {
 				<tr valign="top">
 					<th scope="row">
 					Email<br /><br />
-					<button id="copy-text" class="button button-primary" onclick="copyToClipboard('#content')">Copy to Clipboard</button>
-					<p class="message" style="display: none;"><i>Copied to Clipboard</i></p>
+					<p><i>Click the 'Copy to Clipboard' button to copy email content.</i></p>
 					</th>
 					<td><div id="content" class="content" style="background: #ffffff; padding: 20px;"><?= do_shortcode( get_option('maintenancehelper') ); ?></div></td>
 				</tr>
@@ -101,7 +111,6 @@ class Maintenance_Helper {
 							$bcc = "bcc=".$bccemail."&";
 						}
 					?>
-					<a href="mailto:<?= get_option('client_email'); ?>?<?php echo $bcc; ?>subject=<?php echo get_option('email_subject').' '.get_option('site_name').' - '.get_option('maintenance_month').' '.date('Y'); ?>" class="button button-primary send-email">Send Mail</button>
 					</th>
 				</tr>
 			</table>
@@ -115,14 +124,28 @@ class Maintenance_Helper {
 	    </div>
 
 		<script>
+		jQuery(function($){
+			$("#maintenance-helper .header-btn[data-target=submit").click(function(){
+				$("#maintenance-helper > form .save-generate #submit").trigger("click")
+			});
+		});
 		function copyToClipboard(element) {
 			var $temp = jQuery("<div style='background: #ffffff;'>");
+			var content = jQuery("#maintenance-helper #content").html();
 			jQuery("body").append($temp);
+			
+			//Clipboard API 
 			$temp.attr("contenteditable", true)
 				.html(jQuery(element).html()).select()
-				.on("focus", function() { document.execCommand('selectAll',false,null); })
-				.focus();
-			document.execCommand("copy");
+				.on("focus", function() { 
+				  navigator.clipboard.write([
+					new ClipboardItem({
+					  "text/html": new Blob([content], { type: "text/html" }),
+					  "text/plain": new Blob([content], { type: "text/plain" })
+					})
+				  ]);
+				})
+			.focus();
 			$temp.remove();
 
 			jQuery('.message').slideDown();
@@ -131,8 +154,6 @@ class Maintenance_Helper {
 			}, 5000);
 		}
 
-		// var $emailLink = jQuery('.send-email').attr('href') + '&body=' + jQuery('#content').html();
-		// jQuery('.send-email').attr('href', $emailLink);
 		</script>
 	<?php
 	}
@@ -294,7 +315,9 @@ class Maintenance_Helper {
 				</td>
 				</tr>
 			</table>
-			<?php submit_button( 'Save and Generate' ); ?>
+			<div class="save-generate">
+				<?php submit_button( 'Save and Generate' ); ?>
+			</div>
 		</form>
 	<?php
 	}
