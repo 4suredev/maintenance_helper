@@ -3,7 +3,7 @@
 Plugin Name: 4sure - Maintenance Helper
 Plugin URI: http://4sure.com.au
 Description: This plugin generates an email template that will be used to send updates to the client.
-Version: 1.5.6
+Version: 1.5.7
 Author: 4sure Online
 Author URI: http://4sure.com.au
 License: GPL2
@@ -86,7 +86,7 @@ class Maintenance_Helper {
 					<div class="header-right">
 						<button class="button button-primary header-btn" data-target="submit">Save and Generate</button>
 						<button id="copy-text" class="button button-primary header-btn" onclick="copyToClipboard('#content')">Copy to Clipboard</button>
-						<a href="mailto:<?= get_option('client_email'); ?>?<?php echo $bcc; ?>subject=<?php echo get_option('email_subject').' '.get_option('site_name').' - '.get_option('maintenance_month').' '.date('Y'); ?>" class="button button-primary send-email header-btn">Send Mail</a>
+						<a href="mailto:<?= get_option('client_email'); ?>?<?php if(get_option('bcc_email')) { echo 'bcc='.get_option('bcc_email').'&'; } ?>subject=<?php echo get_option('email_subject').' '.get_option('site_name').' - '.get_option('maintenance_month').' '.date('Y'); ?>" class="button button-primary send-email header-btn">Send Mail</a>
 					</div>
 				</div>
 			</div>
@@ -102,16 +102,6 @@ class Maintenance_Helper {
 					<p><i>Click the 'Copy to Clipboard' button to copy email content.</i></p>
 					</th>
 					<td><div id="content" class="content" style="background: #ffffff; padding: 20px;"><?= do_shortcode( get_option('maintenancehelper') ); ?></div></td>
-				</tr>
-				<tr valign="top">
-					<th scope="row">
-					<?php
-						if(get_option('bcc_email')){
-							$bccemail = get_option('bcc_email');
-							$bcc = "bcc=".$bccemail."&";
-						}
-					?>
-					</th>
 				</tr>
 			</table>
 			<div class="notification-field">
@@ -245,28 +235,28 @@ class Maintenance_Helper {
 			<?php do_settings_sections('maintenance-fields'); ?>
 			<table class="form-table">
 				<tr valign="top">
-					<th scope="row">Client Name <br/ ><i>[client_name]</i></th>
+					<th scope="row">Client Name <br/><i>[client_name]</i></th>
 					<td><input type="text" name="client_name" value="<?= esc_attr( get_option('client_name') ) ?>" /></td>
 				</tr>
 				<tr valign="top">
-					<th scope="row">Site Name <br/ ><i>[site_name]</i></th>
+					<th scope="row">Site Name <br/><i>[site_name]</i></th>
 					<td><input type="text" name="site_name" value="<?= esc_attr( get_option('site_name') ) ?>" /></td>
 				</tr>
 				<tr valign="top">
-					<th scope="row">Client Email <br/ ><i>[client_email]</i></th>
+					<th scope="row">Client Email <br/><i>[client_email]</i></th>
 					<td><input type="text" name="client_email" value="<?= esc_attr( get_option('client_email') ) ?>" /></td>
 				</tr>
 				<tr valign="top">
-					<th scope="row">BCC Email <br/ ><i>[bcc_email]</i></th>
+					<th scope="row">BCC Email <br/><i>[bcc_email]</i></th>
 					<td><input type="text" name="bcc_email" value="<?= esc_attr( get_option('bcc_email') ) ?>" /></td>
 				</tr>
 				<tr valign="top">
-					<th scope="row">Broken Links <br/ ><i>[broken_links]</i></th>
+					<th scope="row">Broken Links <br/><i>[broken_links]</i></th>
 					<?php $links = $this->get_broken_links_count() >= 0 ? $this->get_broken_links_count() : esc_attr( get_option('broken_links') ); //Options API as fallback ?>
 					<td><input type="text" name="broken_links" value="<?= $links ?>" /></td>
 				</tr>
 				<tr valign="top">
-					<th scope="row">Select Month <br/ ><i>[maintenance_month]</i></th>
+					<th scope="row">Select Month <br/><i>[maintenance_month]</i></th>
 					<td>
 						<?php $currmonth = date('F'); ?>
 						<?php $options = $this->get_months(); $value = get_option('maintenance_month'); ?>
@@ -286,15 +276,15 @@ class Maintenance_Helper {
 					</td>
 				</tr>
 				<tr valign="top">
-					<th scope="row">Analytics Link <br/ ><i>[analytics_link]</i></th>
+					<th scope="row">Analytics Link <br/><i>[analytics_link]</i></th>
 					<td><input type="text" name="analytics_link" value="<?= esc_attr( get_option('analytics_link') ) ?>" /></td>
 				</tr>
 				<tr valign="top">
-					<th scope="row">Updates <br/ ><i>[updates]</i></th>
+					<th scope="row">Updates <br/><i>[updates]</i></th>
 					<td><?= $this->get_maintenance_markup(); ?></td>
 				</tr>
 				<tr valign="top">
-					<th scope="row">Email Subject <br/ ><i>[email_subject]</i></th>
+					<th scope="row">Email Subject <br/><i>[email_subject]</i></th>
 					<td><input type="text" name="email_subject" value="<?= esc_attr( get_option('email_subject') ) ?>" /></td>
 				</tr>
 				<tr valign="top">
